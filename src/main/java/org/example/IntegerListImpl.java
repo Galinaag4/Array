@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class IntegerListImpl implements IntegerList {
-    private final Integer[] storage;
+    private Integer[] storage;
     private int size;
 
    public IntegerListImpl(){
@@ -13,21 +13,65 @@ public class IntegerListImpl implements IntegerList {
     public IntegerListImpl(int intSize){
         storage = new Integer[intSize];
     }
-    private void validateSize(){};
+    private void growIfNeeded(){
+       if(size==storage.length){
+           grow();
+       }
+    }
+    private void quickSort(Integer[] arr,int begin, int end){
+       if(begin<end){
+           int partitionIndex = partition(arr,begin,end);
+           quickSort(arr,begin,partitionIndex-1);
+           quickSort(arr,partitionIndex+1,end);
+       }
+    }
+    private int partition(Integer[] arr,int begin, int end){
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElementss(arr, i, j);
+            }
+        }
+
+        swapElementss(arr, i + 1, end);
+        return i + 1;
+    }
+    private void swapElementss(Integer[] arr,int i1, int i2){
+        int temp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = temp;
+
+    }
+    public void sort(Integer[]arr){
+       quickSort(arr,0,arr.length-1);
+
+    }
+
+
+
     private void validateItem(Integer item){};
     private void validateIndex(int index){};
-
-    @Override
-    public Integer add(Integer item) {
-       validateSize();
-       validateItem(item);
-       storage[size++] = item;
-        return item;
+    public void grow(){
+        this.storage = Arrays.copyOf(storage,(int)(storage.length*1.5));
     }
 
     @Override
+    public Integer add(Integer item) {
+        growIfNeeded();
+        validateItem(item);
+        storage[size++] = item;
+        return item;
+    }
+
+
+
+    @Override
     public Integer add(int index, Integer item) {
-        validateSize();
+        growIfNeeded();
         validateItem(item);
         validateIndex(index);
         if(index==size){
@@ -142,7 +186,7 @@ public class IntegerListImpl implements IntegerList {
         }
     }
 
-    public static void sortBubble(Integer[]integers) {
+   public static void sortBubble(Integer[]integers) {
         for (int i = 0; i < integers.length - 1; i++) {
             for (int j = 0; j < integers.length - 1 - i; j++) {
                 if (integers[j] > integers[j + 1]) {
